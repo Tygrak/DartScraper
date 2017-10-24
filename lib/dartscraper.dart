@@ -49,6 +49,35 @@ class Tag{
     return null;
   }
 
+  Tag GetChildWithContent(String content, [bool recursive=false]){
+    for (var i = 0; i < children.length; i++){
+      if (children[i].contents.contains(content)){
+        return children[i];
+      } else if (recursive && children[i].children.length > 0){
+        Tag t = children[i].GetChildWithContent(content, recursive);
+        if (t != null){
+          return t;
+        }
+      }
+    }
+    return null;
+  }
+
+  List<Tag> GetChildWithContentAll(String content, [bool recursive=false]){
+    List<Tag> tags = new List<Tag>();
+    for (var i = 0; i < children.length; i++){
+      if (children[i].contents.contains(content)){
+        tags.add(children[i]);
+      } else if (recursive && children[i].children.length > 0){
+        List<Tag> tagR = children[i].GetChildWithContentAll(content, recursive);
+        for (var i = 0; i < tagR.length; i++) {
+          if (!tags.contains(tagR[i])) tags.add(tagR[i]);
+        }
+      }
+    }
+    return tags;
+  }
+
   Tag GetChildOfType(String type, [bool recursive=false]){
     for (var i = 0; i < children.length; i++){
       if (children[i].type == type){
@@ -63,6 +92,7 @@ class Tag{
     return null;
   }
 
+
   List<Tag> GetChildOfTypeAll(String type, [bool recursive=false]){
     List<Tag> tags = new List<Tag>();
     for (var i = 0; i < children.length; i++){
@@ -70,6 +100,66 @@ class Tag{
         tags.add(children[i]);
       } else if (recursive && children[i].children.length > 0){
         List<Tag> tagR = children[i].GetChildOfTypeAll(type, recursive);
+        for (var i = 0; i < tagR.length; i++) {
+          if (!tags.contains(tagR[i])) tags.add(tagR[i]);
+        }
+      }
+    }
+    return tags;
+  }
+
+  Tag GetChildOfTypeWithContent(String type, String content, [bool recursive=false]){
+    for (var i = 0; i < children.length; i++){
+      if (children[i].contents.contains(content) && children[i].type == type){
+        return children[i];
+      } else if (recursive && children[i].children.length > 0){
+        Tag t = children[i].GetChildOfTypeWithContent(type, content, recursive);
+        if (t != null){
+          return t;
+        }
+      }
+    }
+    return null;
+  }
+
+  List<Tag> GetChildOfTypeWithContentAll(String type, String content, [bool recursive=false]){
+    List<Tag> tags = new List<Tag>();
+    for (var i = 0; i < children.length; i++){
+      if (children[i].contents.contains(content) && children[i].type == type){
+        tags.add(children[i]);
+      } else if (recursive && children[i].children.length > 0){
+        List<Tag> tagR = children[i].GetChildOfTypeWithContentAll(type, content, recursive);
+        for (var i = 0; i < tagR.length; i++) {
+          if (!tags.contains(tagR[i])) tags.add(tagR[i]);
+        }
+      }
+    }
+    return tags;
+  }
+
+  Tag GetChildOfTypeWithAttribute(String type, String attribute, String attributeValue, [bool recursive=false]){
+    for (var i = 0; i < children.length; i++){
+      String attr = children[i].GetAttribute(attribute);
+      if (attr != null && attr.contains(attributeValue) && children[i].type == type){
+        return children[i];
+      } else if (recursive && children[i].children.length > 0){
+        Tag t = children[i].GetChildOfTypeWithAttribute(type, attribute, attributeValue, recursive);
+        if (t != null){
+          return t;
+        }
+      }
+    }
+    return null;
+  }
+
+  List<Tag> GetChildOfTypeWithAttributeAll(String type, String attribute, String attributeValue, [bool recursive=false]){
+    List<Tag> tags = new List<Tag>();
+    for (var i = 0; i < children.length; i++){
+      String attr = children[i].GetAttribute(attribute);
+      if (attr != null && attr.contains(attributeValue) && children[i].type == type){
+        tags.add(children[i]);
+      } else if (recursive && children[i].children.length > 0){
+        List<Tag> tagR = children[i].GetChildOfTypeWithAttributeAll(type, attribute, attributeValue, recursive);
         for (var i = 0; i < tagR.length; i++) {
           if (!tags.contains(tagR[i])) tags.add(tagR[i]);
         }
