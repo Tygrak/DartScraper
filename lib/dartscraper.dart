@@ -279,15 +279,24 @@ class Tag{
       int pos = 0;
       bool quoted = false;
       while (pos < tag.length){
-        int quotePos = tag.indexOf("\"", pos);
+        int quotePos = tag.indexOf(new RegExp("[\'\"]"), pos);
         if (quotePos == -1){
           return null;
+        }
+        String quote = "\"";
+        if (tag[quotePos] == "'"){
+          quote = "'";
+        }
+        if (tag.indexOf(quote, quotePos+1) == -1){
+          pos++;
+          continue;
         }
         int typePos = tag.indexOf("$type", pos);
         if (quotePos < typePos){
           quoted = !quoted;
         } else if (quoted == false){
-          return tag.substring(quotePos+1, tag.indexOf("\"", quotePos+1));
+          int endquote = tag.indexOf(quote, quotePos+1);
+          return tag.substring(quotePos+1, endquote);
         } else{
           quoted = !quoted;
         }
@@ -331,6 +340,10 @@ class Tag{
       int pos = startPos;
       int endPos = startPos+1;
       while (depth > 0){
+        if (pos >= src.length){
+          pos = src.length-1;
+          break;
+        }
         endPos = src.indexOf("</$tagType", pos);
         if (endPos == -1){
           endPos = pos+1;
@@ -342,6 +355,10 @@ class Tag{
           depth--;
           pos = endPos+1;
         }
+      }
+      if (endPos >= src.length){
+        endPos = src.length-1;
+        break;
       }
       endPos = src.indexOf(">", endPos+1)+1;
       children.add(new Tag(src.substring(startPos, endPos), this));
@@ -376,6 +393,7 @@ class Tag{
       }
     }
     contents = src.substring(startPos, endPos);
+    contents = contents.replaceAll(new RegExp("(?:<br\/>)|(?:<br \/>)|(?:<br>)"), "\n");
     contents = contents.replaceAll(new RegExp("<.+?(?=>)."), "");
   }
 }
